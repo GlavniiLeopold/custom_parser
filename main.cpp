@@ -28,12 +28,14 @@ int main(int argc, char *argv[])
         QFile inputFile1(command_line.last());
         if (inputFile1.open(QIODevice::ReadOnly))
         {
+           QString data;
            QTextStream in(&inputFile1);
            while (!in.atEnd())
            {
-               parser->parse(in.readLine());
-               parser->print_tree_nodes();
+               data.append(in.readLine());
            }
+           parser->parse(data);
+           parser->print_tree_nodes();
            inputFile1.close();
         }
         else

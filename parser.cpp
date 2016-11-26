@@ -3,7 +3,7 @@
 Parser::Parser()
 {
     push_back(punctuation, ";,(,)");
-    push_back(keywords, "skip,write,read,while,do,if,then,else");
+    push_back(keywords, "skip,write,read,while,do,if,then,else,:=");
     push_back(op, "+,−,*,/,%,==,!=,>,>=,<,<=,&&,||");
     rules.push_back(new Rule("E", "X"));
     rules.push_back(new Rule("E", "N"));
@@ -16,6 +16,9 @@ Parser::Parser()
 
     rules.push_back(new Rule("S", "S S1"));
     rules.push_back(new Rule("S1", "; S"));
+
+    rules.push_back(new Rule("S", "X S2"));
+    rules.push_back(new Rule("S2", ":= E"));
 
     rules.push_back(new Rule("S", "while W1"));
     rules.push_back(new Rule("W1", "E W2"));
@@ -35,6 +38,7 @@ void Parser::add_rule(QString r, QString f)
 void Parser::parse(QString data)
 {
     tree.clear();
+    data = data.replace("	", " ").replace("\\n", " ");
     std::cout << "parsing string >> " << data.toStdString() << "\n";
     for(int i=0; i<data.size(); i++)
     {
@@ -97,11 +101,8 @@ void Parser::analyse_synt(QStringList &words)
     for(int i=0; i<words.size(); i++)
     {
         QString rule = check_rule(words.at(i));
-        if(rule == NULL)
-        {
-            matrix[i+matrix_size-words.size()]->push_back(words.at(i));
-        }
-        else
+        matrix[i+matrix_size-words.size()]->push_back(words.at(i));
+        if(rule != NULL)
         {
             matrix[i+matrix_size-words.size()]->push_back(rule);
         }
@@ -240,7 +241,7 @@ void Parser::print_tree_nodes()
         {
             std::cout << "  derived from table position " << f1 << "-\"" << matrix.at(f1)->first().toStdString() << "\"";
             if(f2 != -1)
-                std::cout << " and " << f2 << "-\"" << matrix.at(f2)->first().toStdString() << "\"\n";
+                std::cout << " and " << f2 << "-\"" << matrix.at(f2)->last().toStdString() << "\"\n";
             else
                 std::cout << "\n";
         }

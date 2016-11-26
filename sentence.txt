@@ -1,0 +1,4 @@
+if x == y
+	then read y
+	else skip;
+read x; read x; x := 1000 && 1001; read x
