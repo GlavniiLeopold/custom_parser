@@ -13,12 +13,7 @@ struct Connection
     int from1;
     int from2;
 };
-struct {
-        bool operator()(Connection* a, Connection* b)
-        {
-            return a->old < b->old;
-        }
-    } customSort;
+
 
 struct Rule
 {
@@ -35,6 +30,47 @@ struct Rule
     int size;
 };
 
+
+class Tree
+{
+    QVector<Connection*> tree;
+    std::string val(int node, int &from1, int &from2){
+        for(int i=0; i<tree.size(); i++)
+        {
+            if(tree.at(i)->old == node)
+            {
+                from1 = tree.at(i)->from1;
+                from2 = tree.at(i)->from2;
+                return tree.at(i)->rule.toStdString();
+            }
+        }
+        from1 = from2 = -1;
+        return "X";
+    }
+public:
+    Tree(QVector<Connection*> tree){this->tree = tree;}
+
+    void print(int node, int pos = 0)
+    {
+        int right, left;
+        if (node==-1) {
+            for(int i = 0; i < pos; ++i)
+                std::cout << "    ";
+            std::cout << '-' << std::endl;
+            return;
+        }
+        std::string key = val(node, right, left);
+        print(right,pos+1);
+        for(int i = 0; i < pos; i++)
+            std::cout << "    ";
+        std::cout << key << std::endl;
+        print(left,pos+1);
+    }
+
+};
+
+
+
 class Parser
 {
 public:
@@ -45,6 +81,7 @@ public:
     void parse(QString data);
 
 private:
+
     QVector<QString> punctuation;
     QVector<QString> keywords;
     QVector<QString> op;

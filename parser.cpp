@@ -1,10 +1,17 @@
 #include "parser.h"
 
+struct {
+        bool operator()(Connection* a, Connection* b)
+        {
+            return a->old < b->old;
+        }
+    } customSort;
+
 Parser::Parser()
 {
     push_back(punctuation, ";,(,)");
     push_back(keywords, "skip,write,read,while,do,if,then,else,:=");
-    push_back(op, "+,−,*,/,%,==,!=,>,>=,<,<=,&&,||");
+    push_back(op, "==,!=,>=,<=,&&,||,>,<,+,−,*,/,%");
     rules.push_back(new Rule("E", "X"));
     rules.push_back(new Rule("E", "N"));
     rules.push_back(new Rule("S", "skip"));
@@ -69,6 +76,7 @@ void Parser::parse(QString data)
             i+=3;
         }
     }
+
     QStringList words = data.split(' ');
 
     for(int i=0; i<words.size(); i++)
@@ -123,9 +131,9 @@ void Parser::analyse_synt(QStringList &words)
     }
     std::sort(tree.begin(), tree.end(), customSort);
     if(matrix.at(0)->contains("S"))
-        std::cout << "\nRIGHT!\n";
+        std::cout << "\n\n!RIGHT!\n\n";
     else
-        std::cout << "\nWRONG!\n";
+        std::cout << "\n\n!WRONG!\n\n";
 }
 
 QString Parser::check_rule(QString rule0, QString rule1)
@@ -232,6 +240,9 @@ void Parser::divide(QStringList &words, int pos)
 
 void Parser::print_tree_nodes()
 {
+    Tree *parse_tree = new Tree(tree);
+    parse_tree->print(0);
+
     for(int i=0; i<tree.size(); i++)
     {
         int f1 = tree.at(i)->from1;
